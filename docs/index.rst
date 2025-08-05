@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Foo's documentation!
+XL9535/XL9555 16-bit I2C I/O expander
 ===============================
 
-.. doxygenfile:: template-component.h
+.. doxygenfile:: xl95x5.h

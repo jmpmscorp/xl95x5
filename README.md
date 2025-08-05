@@ -1,21 +1,22 @@
-# esp-idf-lib/template-component
+# esp-idf-lib/xl95x5
 
-[![Build examples](https://github.com/esp-idf-lib/template-component/actions/workflows//build.yml/badge.svg)](https://github.com/esp-idf-lib/template-component/actions/workflows//build.yml)
-[![Build docs](https://github.com/esp-idf-lib/template-component/actions/workflows//build-docs.yml/badge.svg)](https://github.com/esp-idf-lib/template-component/actions/workflows//build-docs.yml)
-[![Validation](https://github.com/esp-idf-lib/template-component/actions/workflows//validate-component.yml/badge.svg)](https://github.com/esp-idf-lib/template-component/actions/workflows//validate-component.yml)
+[![Build examples](https://github.com/esp-idf-lib/xl95x5/actions/workflows//build.yml/badge.svg)](https://github.com/esp-idf-lib/xl95x5/actions/workflows//build.yml)
+[![Build docs](https://github.com/esp-idf-lib/xl95x5/actions/workflows//build-docs.yml/badge.svg)](https://github.com/esp-idf-lib/xl95x5/actions/workflows//build-docs.yml)
+[![Validation](https://github.com/esp-idf-lib/xl95x5/actions/workflows//validate-component.yml/badge.svg)](https://github.com/esp-idf-lib/xl95x5/actions/workflows//validate-component.yml)
 
-A template for esp-idf-lib component.
+XL9535/XL9555 16-bit I2C I/O expander 
 
-* [Documentation](https://esp-idf-lib.github.io/template-component/)
-* [Repository](https://github.com/esp-idf-lib/template-component)
-* [Issues](https://github.com/esp-idf-lib/template-component/issues)
+* [Datasheet](https://www.lcsc.com/datasheet/C561273.pdf)
+* [Documentation](https://esp-idf-lib.github.io/xl95x5/)
+* [Repository](https://github.com/esp-idf-lib/xl95x5)
+* [Issues](https://github.com/esp-idf-lib/xl95x5/issues)
 * [Discussions and questions](https://github.com/esp-idf-lib/core/discussions)
-* [Component page at the ESP Component Registry](https://components.espressif.com/components/esp-idf-lib/template-component)
+* [Component page at the ESP Component Registry](https://components.espressif.com/components/esp-idf-lib/xl95x5)
 
 ## Installation
 
 ```sh
-idf.py add-dependency esp-idf-lib/template-component
+idf.py add-dependency esp-idf-lib/xl95x5
 ```
 
 ## Support

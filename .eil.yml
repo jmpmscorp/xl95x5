@@ -1,14 +1,14 @@
 ---
-name: template-component
-description: A template for esp-idf-lib component
+name: xl95x5
+description: XL9535/XL9555 16-bit I/O expander
 version: 1.0.0
 groups:
-  - common
+  - gpio
 code_owners:
-  - trombik
+  - jmpmscorp
 depends:
   - freertos
-thread_safe: n/a
+thread_safe: yes
 targets:
   - esp32
   - esp32c2
@@ -21,7 +21,7 @@ targets:
   - esp32s2
   - esp32s3
   - esp8266
-license: MIT
+license: ISC
 copyrights:
-  - name: trombik
+  - name: jmpmscorp
     year: 2025
