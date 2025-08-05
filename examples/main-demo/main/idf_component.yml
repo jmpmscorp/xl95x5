@@ -1,0 +1,9 @@
+---
+version: 1.0.0
+description: xl95x5 basic usage
+dependencies:
+  esp-idf-lib/xl95x5:
+    version: "~1.0.0"
+    override_path: ../../../
+  esp-idf-lib/i2cdev:
+    version: "*"

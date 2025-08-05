@@ -1,91 +1,202 @@
 /*
- * The MIT License (MIT)
  *
- * Copyright (c) 2025 Tomoyuki Sakurai
+ * ESP-IDF driver for XL9535/XL9555 16-bit I/O expanders for I2C-bus
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * Copyright (c) 2025 Jose Manuel Perez <unclerus@gmail.com>
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * ISC Licensed as described in the file LICENSE
  */
 
-#ifndef __TEMPLATE_COMPONENT_H__
-#define __TEMPLATE_COMPONENT_H__
+#ifndef __XL95X5_H__
+#define __XL95X5_H__
 
-#include <stdint.h> // system headers first
-#include <esp_err.h> // then, esp-idf headers
+#include <stdint.h>
+#include <esp_err.h>
+#include <i2cdev.h>
+
 // #include "local.h" // local header files at the end.
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-#define EXAMPLE_CHIP_ID  0x58 /*!< The chip ID, 0x58 */
+#define XL95X5_I2C_ADDRESS_BASE (0x20) /*!< Default I2C address for XL9535/XL9555 */
+#define XL95X5_I2C_ADDRESS_MAX (0x20 + 8)
+#define EXAMPLE_CHIP_ID 0x58 /*!< The chip ID, 0x58 */
 
-/** @cond */
-#define HIDDEN_ID 0xFF /* This will not be shown in HTML */
-/** @endcond */
+    typedef enum
+    {
+        XL95X5_PORT_0 = 0, /*!< Port 0 */
+        XL95X5_PORT_1,     /*!< Port 1 */
+        XL95X5_PORT_MAX,   /*!< Maximum number of ports */
+    } xl95x5_port_t;
 
-/**
-* @brief Example port number
-*/
-typedef enum {
-    EXAMPLE_NUM_0 = 0, /*!< EXAMPLE port 0 */
-    EXAMPLE_NUM_1, /*!< EXAMPLE port 1 */
-    EXAMPLE_NUM_MAX, /*!< EXAMPLE port max */
-} example_port_t;
+    typedef enum {
+        XL95X5_GPIO_OUTPUT = 0, /*!< GPIO configured as output */
+        XL95X5_GPIO_INPUT,      /*!< GPIO configured as input */
+    } xl95x5_gpio_mode_t;
 
-/**
-* @brief A brief explanation for this function.
-*        A longer explanation should be here.
-*
-* @note Please note that this is an example component
-*
-* @code{c}
-*
-* #include <esp_log.h>
-*
-* // include the header file.
-* #include <template-component.h>
-*
-* #define TAG "example1"
-*
-* void app_main(void)
-* {
-*     uint8_t foo = 1;
-*     uint8_t bar = 2;
-*     esp_err_t err = func1(foo, bar);
-*
-*     ESP_LOGI(TAG, "result: %d", err);
-* }
-* @endcode
-*
-* @warning This is warning.
-*
-* @param[in] arg1 The first argument
-* @param[in] arg2 The second argument
-*
-* @return
-*   - ESP_OK: Successful
-*   - ESP_FAIL: Failure
-*
-*/
-esp_err_t func1(uint8_t arg1, uint8_t arg2);
+    typedef enum {
+        XL95X5_POLARITY_NOT_INVERTED = 0, /*!< Polarity not inverted */
+        XL95X5_POLARITY_INVERTED,         /*!< Polarity inverted */
+    } xl95x5_polarity_t;
+
+    /**
+     * @brief Initialize device descriptor
+     *
+     * Device SCL frequency is 400kHz.
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[in] port I2C port number
+     * @param[in] addr I2C address
+     * @param[in] sda_gpio SDA GPIO
+     * @param[in] scl_gpio SCL GPIO
+     * @return `ESP_OK` on success
+     */
+
+    esp_err_t xl95x5_init_desc(i2c_dev_t *dev, uint8_t addr, i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
+
+    /**
+     * @brief Free device descriptor
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_free_desc(i2c_dev_t *dev);
+
+    /**
+     * @brief Read all(16) gpio level
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[out] id Pointer to store level status
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_get_full_gpio_level(i2c_dev_t *dev, uint16_t *levels);
+
+    /**
+     * @brief Read individual gpio level
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[in] gpio GPIO0...GPIO7 for PORT0, GPIO8...GPIO15 for PORT1
+     * @param[out] id Buffer to store gpios level
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_get_gpio_level(i2c_dev_t *dev, gpio_num_t gpio, uint8_t *level);
+
+    /**
+     * @brief Set all(16) gpio level
+     *
+     * @note If GPIO is configured as input(default at reset), corresponding bitfield value will be ignored.
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[out] id New gpios level to set
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_set_full_gpio_level(i2c_dev_t *dev, uint16_t levels);
+
+    /**
+     * @brief Set individual gpio status
+     *
+     * @note If GPIO is configured as input(default at reset), value will be ignored.
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[in] gpio GPIO0...GPIO7 for PORT0, GPIO8...GPIO15 for PORT1
+     * @param[in] level New gpio level to set
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_set_gpio_level(i2c_dev_t *dev, gpio_num_t gpio, uint8_t level);
+
+    /**
+     * @brief Read all(16) gpio polarity
+     *
+     * 0 - Not inverted, 1 - Inverted
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[out] polarity Buffer to store gpios polarity status
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_get_full_gpio_polarity(i2c_dev_t *dev, uint16_t *polarity);
+
+    /**
+     * @brief Read individual gpio polarity
+     * 
+     * @param[in] dev Pointer to device descriptor
+     * @param[in] gpio GPIO0...GPIO7 for PORT0, GPIO8...GPIO15 for PORT1
+     * @param[out] polarity gpio polarity value. 0 - Not inverted, 1 - Inverted
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_get_gpio_polarity(i2c_dev_t *dev, gpio_num_t gpio, xl95x5_polarity_t *polarity);
+
+    /**
+     * @brief Set all(16) gpios polarity
+     *
+     * 0 - Not inverted, 1 - Inverted
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[out] polarity New GPIOs polarity to set
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_set_full_gpio_polarity(i2c_dev_t *dev, uint16_t polarity);
+
+
+    /**
+     * @brief Set individual gpio polarity
+     *
+     * 
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[in] gpio GPIO0...GPIO7 for PORT0, GPIO8...GPIO15 for PORT1
+     * @param[in] polarity New gpio polarity to set. 0 - Not inverted, 1 - Inverted
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_set_gpio_polarity(i2c_dev_t *dev, gpio_num_t gpio, xl95x5_polarity_t polarity);
+
+    /**
+     * @brief Read all(16) gpio mode (input/output)
+     *
+     * 0 - Output, 1 - Input
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[out] mode Buffer to store gpios mode
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_get_full_gpio_mode(i2c_dev_t *dev, uint16_t *mode);
+
+    /**
+     * @brief Read individual gpio mode (input/output)
+     * 
+     * @param[in] dev Pointer to device descriptor
+     * @param[in] gpio GPIO0...GPIO7 for PORT0, GPIO8...GPIO15 for PORT1
+     * @param[out] mode gpio mode. 0 - Output, 1 - Input
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_get_gpio_mode(i2c_dev_t *dev, gpio_num_t gpio, xl95x5_gpio_mode_t *mode);
+
+    /**
+     * @brief Set all(16) gpios mode
+     *
+     * 0 - Output, 1 - Input
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[out] mode New gpios mode to set
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_set_full_gpio_mode(i2c_dev_t *dev, uint16_t mode);
+
+
+    /**
+     * @brief Set individual gpio mode
+     *
+     * @param[in] dev Pointer to device descriptor
+     * @param[in] gpio GPIO0...GPIO7 for PORT0, GPIO8...GPIO15 for PORT1
+     * @param[in] mode New gpio mode to set. 0 - Output, 1 - Input
+     * @return `ESP_OK` on success
+     */
+    esp_err_t xl95x5_set_gpio_mode(i2c_dev_t *dev, gpio_num_t gpio, xl95x5_gpio_mode_t mode);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __TEMPLATE_COMPONENT_H__
+#endif // __XL95X5_H__
